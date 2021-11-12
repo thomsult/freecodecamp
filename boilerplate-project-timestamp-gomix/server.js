@@ -1,16 +1,10 @@
 // server.js
 // where your node app starts
-var dates = new Date();
 
-const objTemplate = {
-
-    unix:	dates.getTime(),
-    utc:	dates.toUTCString()
-}
-const error = { error : "Invalid Date" };
 // init project
 var express = require('express');
 var app = express();
+
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -24,53 +18,42 @@ app.use(express.static('public'));
 app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
-app.get('/api/:date',(req, res) => {
-  console.log(req.params)
-  if(req.params.date.length > 0){
-      if(req.params.date.match(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/)){
-          var params = req.params.date;
-          var date = new Date(params)
-          res.json({
-              unix:	date.getTime(),
-              utc:	date.toUTCString()
-          })
-      }
-      else if(req.params.date.match(/^(\d){1,}$/)){
-          
 
-
-          var params = parseInt(req.params.date);
-          console.log(params)
-          var date = new Date(params)
-
-          if(date.toString() != 'Invalid Date'){
-          res.json({
-              unix:	date.getTime(),
-              utc:	date.toUTCString()
-          })}
-          else{
-              res.json(error)
-              console.log(error)
-          }
-      }
-      else{
-          res.json(error)
-          console.log(error)
-      }
-      
-  }
-})
-app.get('/api/',(req, res) => {
-  res.json(objTemplate)
-
-});
 
 // your first API endpoint... 
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
+app.get('/api/:date',(req, res) => {
+    console.log(req.params)
 
+    if(req.params.date){
+      if(req.params.date.match(/^(\d){1,}$/)){
+        var dates = new Date(parseInt(req.params.date))
+        console.log(dates)
+        res.json({"unix":parseInt(req.params.date),"utc":dates.toUTCString()})
+      }
+      else{
+        if(new Date(req.params.date) != "Invalid Date" ){
 
+          var dates = new Date(req.params.date)
+          console.log(dates)
+          res.json({"unix":dates.getTime(),"utc":dates.toUTCString()})
+        }
+        else{
+            res.json({ error : "Invalid Date" })
+        }
+        
+      }
+        
+    }
+    
+    
+
+})
+app.get('/api/',(req, res) => { var dates = new Date()
+          console.log(dates)
+          res.json({"unix":dates.getTime(),"utc":dates.toUTCString()})})
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
