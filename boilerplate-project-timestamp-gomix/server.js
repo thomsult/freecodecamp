@@ -70,7 +70,7 @@ app.get('/api/:date',(req, res) => {
         }
         else if(req.params.date == 'whoami'){
           res.json({
-            ipaddress:	req.ip,
+            ipaddress:	req.header('x-forwarded-for'),
             language:	req.headers["accept-language"],
             software:	req.headers['user-agent']
         
