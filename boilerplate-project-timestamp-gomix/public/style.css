@@ -44,3 +44,41 @@ li {
 a {
 	color: #2574A9;
 }
+
+
+
+.user-stories {
+  position: relative;
+  text-align: justify;
+  max-width: 700px;
+  margin: 15px auto;
+}
+
+
+hr{
+	border: solid 0.6px black;
+	margin: 10px auto;
+	max-width: 600px;
+
+}
+
+form {
+  border: solid 1px black;
+  border-radius: 5px;
+  margin: 10px auto;
+  padding: 20px;
+  max-width: 600px;
+}
+
+label {
+  margin-right: 10px;
+}
+
+input {
+  padding: 5px;
+}
+
+input[type=text] {
+  width: 220px;
+  text-align: center;
+}
