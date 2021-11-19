@@ -133,64 +133,33 @@ function chekDuration(Num){
     req.query.limit != undefined? limit = parseInt(req.query.limit) :limit = null;
 
     console.log(start,to,limit)
-    logReply = []
-    id = 0
-
-
-//new  &&
-    for (i = 0; i < LogUser.length; ++i){
-      if(LogUser[i]._id == req.params._id){
-        id = i;
-        if(start == "" && to == "" && limit == null){
-      
-          logReply = [...LogUser[i].log]
-
+    var id = LogUser.findIndex(element => element._id == req.params._id)
+    
+    const logReply =(start,to,limit,id)=>{
+      if(start != "" && to != "" && limit != null){
+        var arrayTemp = GetArrayLog(LogUser,id,start,to)
+        if(arrayTemp.length > limit){
+          return [...arrayTemp.slice(0, limit)]
         }
-        else if (start != "" && to != "" || limit != null){
-          for (j = 0; j < LogUser[i].log.length; ++j){
-            
-            if( logReply.length < limit && limit != null){
-              if(start != "" && to != ""){
-                console.log(new Date(LogUser[i].log[j].date) +" " + start);
-                if(new Date(LogUser[i].log[j].date) > start && new Date(LogUser[i].log[j].date) < to){
-                  logReply.push(LogUser[i].log[j])
-                  console.log(LogUser[i].log[j] + "start");
-                }
-              
-              }else{
-                logReply.push(LogUser[i].log[j])
-                console.log(LogUser[i].log[j] + "nostart");
-              }
-              
-              
-            }else if (limit == null){
-              if(start != "" && to != ""){
-                console.log(new Date(LogUser[i].log[j].date) +" " + start);
-                if(new Date(LogUser[i].log[j].date) > start && new Date(LogUser[i].log[j].date) < to){
-                  logReply.push(LogUser[i].log[j])
-                  console.log(LogUser[i].log[j] + "start");
-                }
-              
-              }else{
-                logReply.push(LogUser[i].log[j])
-                console.log(LogUser[i].log[j] + "nostart");
-              }
-            }
-            
-            
-            else{
+        
+      }
+      if (start != "" && to != "" && limit == null){
+        return [...GetArrayLog(LogUser,id,start,to)]
+      }
+      else{
+        return [...LogUser[id].log]
 
-              break
-            }
-            
-          }
-          
-        }
+      }
+    };
+
+    function GetArrayLog(LogUser,id,start,to){
+      const result = LogUser[id].log.filter(log => log.date > start && log.date < to);
+      return result
+
     }
-   
     
-    
-  };
+
+
  res.status(200).json({
               username: LogUser[id].username,
               _id: LogUser[id]._id,
