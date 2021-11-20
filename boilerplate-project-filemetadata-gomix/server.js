@@ -22,22 +22,7 @@ const storage = multer.diskStorage({
 
 })
 
-const upload = multer({ storage: storage,
-  fileFilter: function (req, file, cb) {
-    
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
-      console.log('image Upload');
-      
-      
-      //name, type, and size in bytes within the JSON response.
-      cb(null, true);
-      ;
-    } else {
-      cb(null, false);
-      console.log('not Upload');
-      return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-    };
-  }}).single('upfile')
+const upload = multer({ storage: storage}).single('upfile')
   
 
 app.get('/', function (req, res) {
