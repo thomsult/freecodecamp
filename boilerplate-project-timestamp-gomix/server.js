@@ -60,13 +60,14 @@ app.post('/api/users',(req, res)=>{
 app.post('/api/users/:_id/exercises',(req, res)=>{
 
   //console.log(req.params._id+" " + JSON.stringify(req.body));
+  var dateex = chekDate(req.body['date'])
 for (i = 0; i < LogUser.length; ++i) {
     if(LogUser[i]._id == req.params._id){
       var id = i;
       LogUser[i].count++;
       LogUser[i].log.push({description: req.body['description'],
         duration: chekDuration(req.body['duration']),
-        date: chekDate(req.body['date'])})
+        date: dateex})
         break
     }
 
@@ -75,7 +76,7 @@ for (i = 0; i < LogUser.length; ++i) {
         username: LogUser[id].username,
         description: req.body['description'],
         duration: chekDuration(req.body['duration']),
-        date: chekDate(req.body['date']),
+        date: dateex.toDateString(),
         _id: LogUser[id]._id
       })
     
@@ -89,10 +90,10 @@ for (i = 0; i < LogUser.length; ++i) {
 
     var d = new Date(strg);
     if (d == "Invalid Date") {
-        return new Date().toDateString() 
+        return new Date()
     }
     else{
-      return new Date(strg).toDateString() 
+      return new Date(strg) 
     }
   }
 
@@ -111,8 +112,25 @@ function chekDuration(Num){
 
 
 
+function displayDate(tab){
+      if(tab.length > 1){
+        for (i = 0; i < tab.length; ++i){
+          tab[i].date = new Date(tab[i].date).toDateString()
 
+        }
+      }
+      else if(tab.length > 0){
+        tab[0].date = new Date(tab[0].date).toDateString()
 
+      }
+      
+      return [...tab]
+    }
+function GetArrayLog(LogUser,id,start,to){
+      const result = LogUser[id].log.filter(log => log.date > start && log.date < to);
+      return result
+
+    }
 
 
 
@@ -127,45 +145,57 @@ function chekDuration(Num){
 
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-    var start = new Date(req.query.from) != "Invalid Date"?new Date(req.query.from):"";
-    var to = new Date(req.query.to)!= "Invalid Date"?new Date(req.query.to):"";
+    var start = new Date(req.query.from) != "Invalid Date"?new Date(req.query.from):null;
+    var to = new Date(req.query.to)!= "Invalid Date"?new Date(req.query.to):null;
     var limit = 0;
     req.query.limit != undefined? limit = parseInt(req.query.limit) :limit = null;
 
-    console.log(start,to,limit)
+    var logReply = []
     var id = LogUser.findIndex(element => element._id == req.params._id)
-    
-    const logReply =(start,to,limit,id)=>{
-      if(start != "" && to != "" && limit != null){
+    console.log(start,to,limit,id)
+    const prom = new Promise((resolve, reject) => {
+    function chek(start,to,limit,id){
+      if(start != null && to != null && limit != null){
         var arrayTemp = GetArrayLog(LogUser,id,start,to)
         if(arrayTemp.length > limit){
           return [...arrayTemp.slice(0, limit)]
         }
         
       }
-      if (start != "" && to != "" && limit == null){
+      else if(start == null && to == null && limit != null){
+        var arrayTemp = [...LogUser[id]["log"]]
+        if(limit <= arrayTemp.length){
+          return [...arrayTemp.slice(0, limit)]
+        }
+        else{
+            return [...arrayTemp]
+        }
+        
+      }
+      else if (start != null && to != null && limit == null){
         return [...GetArrayLog(LogUser,id,start,to)]
       }
-      else{
-        return [...LogUser[id].log]
+      else if (start == null && to == null && limit == null){
+        return [...LogUser[id]["log"]]
 
       }
-    };
-
-    function GetArrayLog(LogUser,id,start,to){
-      const result = LogUser[id].log.filter(log => log.date > start && log.date < to);
-      return result
-
     }
+    logReply = chek(start,to,limit,id);
+    resolve();
     
-
-
- res.status(200).json({
+    
+    })
+prom.then(() => {
+  
+res.status(200).json({
               username: LogUser[id].username,
               _id: LogUser[id]._id,
               count:LogUser[id].count,
-              log:logReply
-            })})
+              log:displayDate(logReply)
+            })
+});
+
+ })
 
 
 
