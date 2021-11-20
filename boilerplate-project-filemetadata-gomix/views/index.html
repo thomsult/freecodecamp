@@ -18,8 +18,9 @@
         </p>
         <div class="view">
           <h4 id="output"></h4>
+          <div id="img-preview"></div>
           <form enctype="multipart/form-data" method="POST" action="/api/fileanalyse">
-            <input id="inputfield" type="file" name="upfile">
+            <input id="inputfield" type="file" name="upfile" accept="image/png, image/jpeg">
             <input id="button" type="submit" value="Upload">
           </form>
         </div>
@@ -30,5 +31,26 @@
           <a href="http://www.freecodecamp.com">freeCodeCamp</a>
         </p>
       </div>
+
+      <script>
+        const image = document.getElementById("inputfield")
+        const imgDisplay = document.getElementById("img-preview")
+        image.addEventListener("change", function () {
+        getImgData();
+        });
+
+
+        function getImgData() {
+          const files = image.files[0];
+          if (files) {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(files);
+            fileReader.addEventListener("load", function () {
+              imgDisplay.style.display = "block";
+              imgDisplay.innerHTML = '<img src="' + this.result + '" />';
+            });    
+          }
+        }
+      </script>
    </body>
 </html>
