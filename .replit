@@ -1,2 +1,2 @@
 language = "nodejs"
-run = "node boilerplate-project-timestamp-gomix/server.js"
+run = "node boilerplate-project-filemetadata-gomix/server.js"
