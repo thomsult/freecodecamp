@@ -11,7 +11,7 @@ app.use('/uploads', express.static(__dirname +'/uploads'));
 var uploadArray = [];
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads/')
+    cb(null, __dirname +'/uploads/')
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
@@ -24,16 +24,21 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage,
   fileFilter: function (req, file, cb) {
+    
     if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
       console.log('image Upload');
+      
+      
       //name, type, and size in bytes within the JSON response.
       cb(null, true);
+      ;
     } else {
       cb(null, false);
       console.log('not Upload');
       return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-    }
+    };
   }}).single('upfile')
+  
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/views/index.html');
@@ -41,31 +46,38 @@ app.get('/', function (req, res) {
 app.post('/api/fileanalyse',function (req, res) {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
-      res.json({ message: err })
+       res.status(500).json({ message: err})
     } else if (err) {
-      res.json({ message: err })
+       res.status(500).json({ message: err,message2: 'file no allowed'})
     }
-
+    else if(req.file){
     console.log(req.file)
     var fileJsoninfo = {
       id: req.file.filename,
       name: req.file.originalname,
       type: req.file.mimetype,
       size: req.file.size,
-      url:'http://localhost:3000/api/uploads/'+req.file.filename
+      url:'https://freecodecamp.thomsult.repl.co/api/uploads/'+req.file.filename}
+    uploadArray.push(fileJsoninfo);
+      res.status(200).json(fileJsoninfo)
+    }
+    else{
+      res.status(200).json({ message: 'file no allowed'})
 
     }
-    uploadArray.push(fileJsoninfo);
+    
+    
+    
+})
+   
 
-    res.json(fileJsoninfo)
-    })
     
     
     
   })
   app.get('/api/uploads/:img',function (req, res){
     var fl = req.params.img
-    res.sendFile(__dirname +'/uploads/'+fl)
+     res.status(200).sendFile(__dirname +'/uploads/'+fl)
 
   })
 
